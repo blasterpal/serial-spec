@@ -7,8 +7,10 @@ group :development do
 end
 
 group :test do
-  gem "rack-test",         "~> 0.6.3"
+  gem "appraisal"
+  gem "rack-test",        "~> 0.6.3"
   gem "rspec",             "~> 3.2"
+end
 
 # Specify your gem's dependencies in serial-spec.gemspec
 gemspec
