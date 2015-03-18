@@ -1,3 +1,8 @@
 language: ruby
 rvm:
   - 2.1.0
+gemfile:
+  - gemfiles/ams_0.8.3.gemfile
+  - gemfiles/no_ams.gemfile
+
+script: "bundle exec rake rspec"
