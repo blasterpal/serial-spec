@@ -3,9 +3,7 @@ require "serial_spec/version"
 require "serial_spec/it_expects"
 require "serial_spec/parsed_body"
 require "serial_spec/request_response"
-require "serial_spec/request_response/provide"
 require "inheritable_accessors"
-
 begin
   require 'active_model_serializers'
 rescue LoadError
@@ -16,9 +14,9 @@ module SerialSpec
   include ItExpects
   include RequestResponse
   include RequestResponse::Helpers
-
   if defined?(ActiveModel::Serializer)
-    include RequestResponse::Provide
+    require "serial_spec/request_response/provides_matcher"
+    include RequestResponse::ProvideMatcher
   end
 
   SERIAL_VALID_VERBS = %w{GET POST PUT PATCH DELETE OPTIONS HEAD}
