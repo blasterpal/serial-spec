@@ -1,8 +1,7 @@
 language: ruby
+bundler_args: --without development
+before_install: gem install bundler --version=1.8.2
 rvm:
   - 2.1.0
-gemfile:
-  - gemfiles/ams_0.8.3.gemfile
-  - gemfiles/no_ams.gemfile
-
-script: "bundle exec rake rspec"
+notifications:
+  email: false
