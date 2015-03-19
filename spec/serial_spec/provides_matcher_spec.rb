@@ -7,12 +7,6 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
     [Comment.new(:title => "Comment1"), Comment.new(:title => "Comment2")]
   end
   let(:user) { User.new(name: "Enrique") }
-  #let(:post) do 
-    #p = Post.new(:title => "New Post", :body => "Body of new post")
-    #p.comments = comments
-    #p.author = user
-    #p
-  #end
   let(:serialized_post) do
     PostSerializer.new(post).as_json
   end
@@ -40,6 +34,22 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
           expect(serialized_post).to provide(post)
         end
       end
+    end
+    context "with associations" do
+      let(:post) do 
+        p = Post.new(:title => "New Post", :body => "Body of new post")
+        p.comments = comments
+        p.author = user
+        p
+      end
+        it "should match serialized model" do
+require'pry';binding.pry
+          expect(serialized_post).to provide(post, as: PostSerializer)
+        end
+        it "should fall back to default serializer" do
+          expect(serialized_post).to provide(post)
+        end
+
     end
   end
 
