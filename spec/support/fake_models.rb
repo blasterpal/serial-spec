@@ -2,17 +2,30 @@ require 'active_model_serializers'
 
 # inspired from ASM
 class Model
-  def initialize(hash={})
+  
+  attr_reader :options
+  def initialize(hash={},options={})
     @attributes = hash
+    @options = options
   end
 
   def read_attribute_for_serialization(name)
     @attributes[name]
   end
 
-  def as_json(*)
-    { :model => "Model" }
+  def serializable_hash
+    @attributes
   end
+
+  def as_json(options=nil)
+    options ||= {}
+    if options[:root] == false
+      serializable_hash
+    else
+      { self.class.to_s.downcase.to_sym => serializable_hash }
+    end
+  end
+
 end
 
 class Comment < Model

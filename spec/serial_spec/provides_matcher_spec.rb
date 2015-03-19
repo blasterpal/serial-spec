@@ -16,19 +16,28 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
   let(:serialized_post) do
     PostSerializer.new(post).as_json
   end
+  let(:serialized_posts) do
+    PostSerializer.new([post]).as_json
+  end
 
 
   context "using provide" do
-    context "no associations" do
-      let(:post) do
-        Post.new(:title => "New Post", :body => "Body of new post")
+    let(:post) do
+      Post.new(:title => "New Post", :body => "Body of new post")
+    end
+    context ":as not valid" do
+      it "should raise error" do
+        expect{provide(post, as: Object) == serialized_post}.to \
+          raise_error(SerialSpec::RequestResponse::ProvideMatcher::Provide::SerializerNotFound)
       end
-      context "with :as" do
+    end
+    context "with no associations" do
+      context "supplying :as serializer" do
         it "should match serialized model" do
           expect(serialized_post).to provide(post, as: PostSerializer)
         end
-        xit "should fall back to default serializer" do
-          expect(serialized_post).to provide(post, as: nil)
+        it "should fall back to default serializer" do
+          expect(serialized_post).to provide(post)
         end
       end
     end
