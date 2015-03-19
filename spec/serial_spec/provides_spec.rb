@@ -10,6 +10,9 @@ describe "SerialSpec::RequestResponse::Provide" do
   let(:post) do
     Post.new(:title => "New Post", :body => "Body of new post")
   end
+  let(:serialized_post) do
+    PostSerializer.new(post)
+  end
 
   #let(:post) do 
     #p = Post.new(:title => "New Post", :body => "Body of new post")
@@ -45,6 +48,7 @@ describe "SerialSpec::RequestResponse::Provide" do
   context "using provide" do
     context "with :as" do
       it "should match serialized model" do
+require'pry';binding.pry
         #expect(serialized_post)e.to provide(post, as: PostSerializer)
       end
     end

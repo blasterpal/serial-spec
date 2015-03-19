@@ -57,14 +57,15 @@ class CommentSerializer
   end
 end
 
-class PostSerializer < ActiveModel::Serializer
-  attributes :title, :body
-  has_many :comments, :serializer => CommentSerializer
-  has_one :author, :serializer => UserSerialier
-end
-
 class UserSerializer < ActiveModel::Serializer
   attributes :name
 end
+
+class PostSerializer < ActiveModel::Serializer
+  attributes :title, :body
+  has_many :comments, :serializer => CommentSerializer
+  has_one :author, :serializer => UserSerializer
+end
+
 
 
