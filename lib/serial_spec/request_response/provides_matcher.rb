@@ -42,7 +42,8 @@ module SerialSpec
 
           def actual_to_hash(actual)
             if actual.kind_of? SerialSpec::ParsedBody 
-              actual.execute
+              actual
+              #actual.execute
             else
               actual 
             end
