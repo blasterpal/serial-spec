@@ -34,6 +34,12 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
 
     context "when actual is ParsedBody" do
       it "should match serialized model" do
+        actual = parsed_body.execute.with_indifferent_access
+        expected = PostSerializer.new(post).as_json.with_indifferent_access
+        # serialized post has nil attributes b/c of stupid fake objects
+
+        expect(actual).to match(expected)
+        
         expect(parsed_body).to provide(post, as: PostSerializer)
       end
     end

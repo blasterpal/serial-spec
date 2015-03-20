@@ -5,8 +5,8 @@ module SerialSpec
   module RequestResponse
     module ProvideMatcher
 
-      def provide(serializable,options={})
-        SerialSpec::RequestResponse::ProvideMatcher::Provide.new(serializable, options)
+      def provide(expected,options={})
+        SerialSpec::RequestResponse::ProvideMatcher::Provide.new(expected, options)
       end
 
       class Provide
@@ -17,6 +17,7 @@ module SerialSpec
 
         def initialize(expected,options={})
           @expected = expected
+require'pry';binding.pry
           @as_serializer = options[:as]
         end
 
@@ -56,7 +57,7 @@ module SerialSpec
         end
 
         # when rspec asserts eq
-        alias == matches?
+        #alias == matches?
 
         def failed_message(msg) 
           case msg
