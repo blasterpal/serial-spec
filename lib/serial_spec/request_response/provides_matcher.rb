@@ -1,4 +1,5 @@
 require 'active_support/inflector'
+require 'yaml'
 
 module SerialSpec
   module RequestResponse
@@ -19,59 +20,61 @@ module SerialSpec
           @as_serializer = options[:as]
         end
 
+        def actual_to_hash(actual)
+          if actual.kind_of? SerialSpec::ParsedBody 
+            actual.execute
+          else
+            actual
+          end
+        end
 
-          def expected_serialized
-            if as_serializer
-              unless as_serializer.respond_to?(:as_json)
-                throw(:failed, :serializer_not_valid)
-              end
-              as_serializer.new(expected).as_json
-            else
-              ActiveModel::Serializer.new(expected).as_json
+        def expected_to_hash
+          if as_serializer && serializer = as_serializer.new(expected)
+            unless serializer.respond_to?(:as_json)
+              throw(:failed, :serializer_not_valid)
             end
+            serializer.as_json
+          else
+            ActiveModel::Serializer.new(expected).as_json
           end
+        end
 
-          def matches?(actual)
-            failure = catch(:failed) do
-              # make a deep hash comparison here
-              expected_serialized == actual_to_hash(actual)
-              @failure_message = failed_message(failure) if failure 
-              !failure
-            end
+        #lazy recursive comparison
+        def deep_match?(actual,expected_hash)
+          if actual.to_yaml.eql?(expected_hash.to_yaml)
+          else
+            throw(:failed, :response_and_model_dont_match)
           end
+        end
 
-          def actual_to_hash(actual)
-            if actual.kind_of? SerialSpec::ParsedBody 
-              actual
-              #actual.execute
-            else
-              actual 
-            end
+        def matches?(actual)
+          failure = catch(:failed) do
+            deep_match?(actual_to_hash(actual),expected_to_hash) 
           end
-          
-          # order of keys and key types
-          def deep_match?(actual_hash,expected_hash)
-
-          end
-
+          @failure_message = failed_message(failure) if failure 
+          !failure
+        end
 
         # when rspec asserts eq
         alias == matches?
 
-        def failed_message(msg)
+        def failed_message(msg) 
           case msg
-          when :serializer_not_valid    then "as: serializer not valid"
+          when :response_and_model_dont_match
+            "response and serialized object do not match" 
+          when :serializer_not_valid
+            "serializer not valid"
           else
-            raise "[ERROR] need a better catch statement"
+            "no failed_message found, this is default"
           end
         end
 
         def failure_message
-          "error should to implement"
+          @failure_message || "error should TO  implement"
         end
 
         def failure_message_when_negated
-          "error should not to implement"
+          @failure_message || "error should not  TO implement"
         end
 
       end

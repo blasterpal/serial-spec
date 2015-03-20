@@ -18,7 +18,7 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
   end
   let(:response) { post }
   let(:parsed_body) do 
-    SerialSpec::ParsedBody.new( response.as_json )
+    SerialSpec::ParsedBody.new(response.as_json(root: true))
   end
 
   context "using provide" do

@@ -19,10 +19,10 @@ class Model
 
   def as_json(options=nil)
     options ||= {}
-    if options[:root] == false
-      serializable_hash.deep_stringify_keys!.to_json
-    else
+    if options[:root] == true
       { self.class.to_s.downcase.to_sym => serializable_hash }.deep_stringify_keys!.to_json
+    else
+      serializable_hash.deep_stringify_keys!.to_json
     end
   end
 
