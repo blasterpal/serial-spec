@@ -14,16 +14,15 @@ class Model
   end
 
   def serializable_hash
-    @attributes
+    @attributes.deep_stringify_keys!
   end
 
-  def as_json(options=nil)
-    options ||= {}
-    if options[:root] == true
-      { self.class.to_s.downcase.to_sym => serializable_hash }.deep_stringify_keys!.to_json
-    else
-      serializable_hash.deep_stringify_keys!.to_json
-    end
+  def to_json
+    serializable_hash
+  end
+
+  def as_json
+    serializable_hash
   end
 
 end
@@ -33,11 +32,13 @@ class Comment < Model
 end
 
 class Post < Model
-  attr_accessor :comments, :comments_disabled, :author
+  attr_accessor :comments, :comments_disabled, :author, :title, :body
   def initialize(attributes)
     super(attributes)
-    self.comments ||= []
-    self.author = nil
+    self.comments ||= attributes[:comments] || [] 
+    self.author = attributes[:author] || nil
+    self.title = attributes[:title] || nil
+    self.body  = attributes[:body] || nil
   end
   def active_model_serializer; PostSerializer; end
 end

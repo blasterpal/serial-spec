@@ -13,7 +13,7 @@ module SerialSpec
         class SerializerNotFound < StandardError ; end
 
         attr_reader :as_serializer
-        attr_reader :expected 
+        attr_reader :expected
 
         def initialize(expected,options={})
           @expected = expected

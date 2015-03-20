@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe "SerialSpec::RequestResponse::ProvideMatcher" do
   include SerialSpec::RequestResponse::ProvideMatcher
-
   let(:comments) do 
     [Comment.new(:title => "Comment1"), Comment.new(:title => "Comment2")]
   end
@@ -16,9 +15,9 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
   let(:serialized_posts) do
     PostSerializer.new([post]).as_json
   end
-  let(:response) { post }
+  let(:response) { {post: post.serializable_hash}.to_json }
   let(:parsed_body) do 
-    SerialSpec::ParsedBody.new(response.as_json(root: true))
+    SerialSpec::ParsedBody.new(response)
   end
 
   context "using provide" do
