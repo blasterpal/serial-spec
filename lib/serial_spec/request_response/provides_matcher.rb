@@ -17,7 +17,6 @@ module SerialSpec
 
         def initialize(expected,options={})
           @expected = expected
-require'pry';binding.pry
           @as_serializer = options[:as]
         end
 
@@ -30,6 +29,7 @@ require'pry';binding.pry
         end
 
         def expected_to_hash
+          return_hash = {}
           if as_serializer && serializer = as_serializer.new(expected)
             unless serializer.respond_to?(:as_json)
               throw(:failed, :serializer_not_valid)
@@ -42,7 +42,10 @@ require'pry';binding.pry
 
         #lazy recursive comparison
         def deep_match?(actual,expected_hash)
-          if actual.to_yaml.eql?(expected_hash.to_yaml)
+          unless actual.kind_of?(Hash)
+            throw(:failed, :response_not_valid)
+          end
+          if actual.deep_stringify_keys.to_yaml.eql?(expected_hash.deep_stringify_keys.to_yaml)
           else
             throw(:failed, :response_and_model_dont_match)
           end
@@ -57,7 +60,7 @@ require'pry';binding.pry
         end
 
         # when rspec asserts eq
-        #alias == matches?
+        alias == matches?
 
         def failed_message(msg) 
           case msg
@@ -65,6 +68,8 @@ require'pry';binding.pry
             "response and serialized object do not match" 
           when :serializer_not_valid
             "serializer not valid"
+          when :response_not_valid
+            "response not valid or hash"
           else
             "no failed_message found, this is default"
           end

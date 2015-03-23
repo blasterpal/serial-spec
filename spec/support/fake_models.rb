@@ -2,28 +2,30 @@ require 'active_model_serializers'
 
 # inspired from ASM
 class Model
-  
+include ActiveModel::SerializerSupport
+include ActiveModel::ArraySerializerSupport
+
   attr_reader :options
   def initialize(hash={},options={})
     @attributes = hash
     @options = options
   end
 
-  def read_attribute_for_serialization(name)
-    @attributes[name]
-  end
+  #def read_attribute_for_serialization(name)
+    #@attributes[name]
+  #end
 
-  def serializable_hash
-    @attributes.deep_stringify_keys!
-  end
+  #def serializable_hash
+    #@attributes.deep_stringify_keys!
+  #end
 
-  def to_json
-    serializable_hash
-  end
+  #def to_json
+    #serializable_hash
+  #end
 
-  def as_json
-    serializable_hash
-  end
+  #def as_json
+    #serializable_hash
+  #end
 
 end
 
@@ -34,7 +36,6 @@ end
 class Post < Model
   attr_accessor :comments, :comments_disabled, :author, :title, :body
   def initialize(attributes)
-    super(attributes)
     self.comments ||= attributes[:comments] || [] 
     self.author = attributes[:author] || nil
     self.title = attributes[:title] || nil
