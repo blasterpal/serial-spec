@@ -14,6 +14,10 @@ include ActiveModel::ArraySerializerSupport
 end
 
 class Comment < Model
+  attr_accessor :title
+  def initialize(attrs)
+    self.title = attrs[:title]
+  end
   def active_model_serializer; CommentSerializer; end
 end
 
@@ -29,31 +33,18 @@ class Post < Model
 end
 
 class User < Model
+  attr_accessor :name
+  def initialize(attrs)
+    self.name = attrs[:name]
+  end
   def active_model_serializer; CommentSerializer; end
 end
 
 
 # SErializers
 
-class CommentSerializer
-  def initialize(comment, options={})
-    @object = comment
-  end
-
-  attr_reader :object
-
-  def serializable_hash
-    { :title => @object.read_attribute_for_serialization(:title) }
-  end
-
-  def as_json(options=nil)
-    options ||= {}
-    if options[:root] == false
-      serializable_hash
-    else
-      { :comment => serializable_hash }
-    end
-  end
+class CommentSerializer < ActiveModel::Serializer
+  attributes :title
 end
 
 class UserSerializer < ActiveModel::Serializer
