@@ -27,7 +27,7 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
   end
 
   let(:resource_json) { PostSerializer.new(post).as_json.to_json }
-  let(:collection_json) { Activemodel::ArraySerializer.new(posts,serializer: PostSerializer, root: 'posts')}
+  let(:collection_json) { ActiveModel::ArraySerializer.new(posts,serializer: PostSerializer, root: 'posts').as_json.to_json}
 
   let(:response) { resource_json }
   let(:parsed_body) { SerialSpec::ParsedBody.new(response) }
@@ -56,56 +56,63 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
       it "should match serialized resource" do
         expect(parsed_body).to provide(post, as: PostSerializer)
       end
+      context ":with_root" do
+        it "should match serialized resource with supplied root" do
+          expect(parsed_body).to provido(post, as: PostSerializer, root: 'tester')
+        end
+      end
     end
+
     context "collection" do
       let(:response) { collection_json }
       it "should match serialized resource" do
-        expect(parsed_body).to provide(post, as: PostSerializer)
+        expect(parsed_body).to provide(posts, as: PostSerializer)
       end
     end
 
 
-    context "with no associations" do
-      context "supplying :as serializer" do
-        it "should match serialized model" do
-          expect(serialized_post).to provide(post, as: PostSerializer)
-        end
-        it "should fall back to default serializer" do
-          expect(serialized_post).to provide(post)
-        end
-      end
-    end
+    #context "with no associations" do
+      #context "supplying :as serializer" do
+        #it "should match serialized model" do
+          #expect(serialized_post).to provide(post, as: PostSerializer)
+        #end
+        #it "should fall back to default serializer" do
+          #expect(serialized_post).to provide(post)
+        #end
+      #end
+    #end
 
-    context "with associations" do
-      let(:post) do 
-        p = Post.new(:title => "New Post", :body => "Body of new post")
-        p.comments = comments
-        p.author = user
-        p
-      end
-      let(:other_post) do 
-        p = post
-        p.comments = reordered_comments
-        p.author = user
-        p
-      end
+    #context "with associations" do
+      #let(:post) do 
+        #p = Post.new(:title => "New Post", :body => "Body of new post")
+        #p.comments = comments
+        #p.author = user
+        #p
+      #end
+      #let(:other_post) do 
+        #p = post
+        #p.comments = reordered_comments
+        #p.author = user
+        #p
+      #end
 
-      it "should match serialized model" do
-        expect(serialized_post).to provide(post, as: PostSerializer)
-      end
-      it "should fall back to default serializer" do
-        expect(serialized_post).to provide(post)
-      end
-      context "ordering" do
-        let(:serialized_post) do
-          PostSerializer.new(other_post).as_json
-        end
-        it "should match serialized model" do
-          expect(serialized_post).to provide(post, as: PostSerializer)
-        end
-      end
+      #it "should match serialized model" do
+        #expect(serialized_post).to provide(post, as: PostSerializer)
+      #end
+      #it "should fall back to default serializer" do
+        #expect(serialized_post).to provide(post)
+      #end
+      #context "ordering" do
+        #let(:serialized_post) do
+          #PostSerializer.new(other_post).as_json
+        #end
+        #it "should match serialized model" do
+          #expect(serialized_post).to provide(post, as: PostSerializer)
+        #end
+      #end
 
-    end
+    #end
+    
   end
 
 end

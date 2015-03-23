@@ -13,11 +13,28 @@ module SerialSpec
         class SerializerNotFound < StandardError ; end
 
         attr_reader :as_serializer
+        attr_reader :with_root
         attr_reader :expected
 
         def initialize(expected,options={})
-          @expected = expected
-          @as_serializer = options[:as]
+          @expected       = expected
+          @as_serializer  = options[:as]
+          @with_root      = options[:with_root]
+        end
+
+        def resource_root 
+          return with_root if with_root
+          if as_serializer
+            as_serializer.name.demodulize.underscore.sub(/_serializer$/, '')
+          else
+            nil
+          end
+        end
+
+        def collection_root
+          return with_root if with_root
+          return nil if resource_root.nil?
+          resource_root.pluralize
         end
 
         def actual_to_hash(actual)
@@ -28,15 +45,27 @@ module SerialSpec
           end
         end
 
-        def expected_to_hash
+        def resource_hash
           if as_serializer
-            begin
-              as_serializer.new(expected).as_json
-            rescue StandardError #need more specificity here
-              throw(:failed, :serializer_not_valid)
-            end
+            as_serializer.new(expected, root: resource_root).as_json
           else
-            ActiveModel::Serializer.new(expected).as_json
+            ActiveModel::Serializer.new(expected, root: resource_root).as_json
+          end
+        end
+
+        def collection_hash
+          if as_serializer
+            ActiveModel::ArraySerializer.new(expected,serializer: as_serializer, root: collection_root).as_json
+          else
+            ActiveModel::ArraySerializer.new(expected, root: collection_root).as_json
+          end
+        end
+
+        def expected_to_hash
+          if expected.kind_of?(Array)
+            collection_hash
+          else
+            resource_hash
           end
         end
 
