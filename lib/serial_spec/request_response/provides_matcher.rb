@@ -22,21 +22,6 @@ module SerialSpec
           @with_root      = options[:with_root]
         end
 
-        def resource_root 
-          return with_root if with_root
-          if as_serializer
-            as_serializer.name.demodulize.underscore.sub(/_serializer$/, '')
-          else
-            nil
-          end
-        end
-
-        def collection_root
-          return with_root if with_root
-          return nil if resource_root.nil?
-          resource_root.pluralize
-        end
-
         def actual_to_hash(actual)
           if actual.kind_of? SerialSpec::ParsedBody 
             actual.execute
@@ -47,17 +32,17 @@ module SerialSpec
 
         def resource_hash
           if as_serializer
-            as_serializer.new(expected, root: resource_root).as_json
+            as_serializer.new(expected, root: with_root).as_json
           else
-            ActiveModel::Serializer.new(expected, root: resource_root).as_json
+            ActiveModel::Serializer.new(expected, root: with_root).as_json
           end
         end
 
         def collection_hash
           if as_serializer
-            ActiveModel::ArraySerializer.new(expected,serializer: as_serializer, root: collection_root).as_json
+            ActiveModel::ArraySerializer.new(expected,serializer: as_serializer, root: with_root ).as_json
           else
-            ActiveModel::ArraySerializer.new(expected, root: collection_root).as_json
+            ActiveModel::ArraySerializer.new(expected, root: with_root).as_json
           end
         end
 
@@ -73,12 +58,25 @@ module SerialSpec
         # for now a lazy deep comparison, look ma' no iteration!
 
         def deep_match?(actual,expected_hash)
+
           unless actual.kind_of?(Hash)
             throw(:failed, :response_not_valid)
           end
-          if actual.deep_stringify_keys.to_yaml.eql?(expected_hash.deep_stringify_keys.to_yaml)
+          actual_cleaned = normalize_data(actual).to_hash
+          expected_cleaned = normalize_data(expected_hash).to_hash
+          if actual_cleaned.to_yaml.eql?(expected_cleaned.to_yaml)
           else
             throw(:failed, :response_and_model_dont_match)
+          end
+        end
+
+       def normalize_data(data)
+          if data.kind_of?(Array)
+            data.each_with_index do |el,index|
+              data[index] = normalize_data(el)
+            end
+          elsif data.kind_of?(Hash)
+            data.deep_stringify_keys!
           end
         end
 

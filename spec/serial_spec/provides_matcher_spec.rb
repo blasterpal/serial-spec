@@ -28,22 +28,14 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
       end
     end
 
-    context "when actual is ParsedBody" do
-      it "should match" do
-        expect(parsed_body).to provide(post, as: PostSerializer)
-      end
-    end
     context "when actual is Hash" do
       it "should match" do
-        expect(parsed_body.execute).to provide(post, as: PostSerializer)
+        expect(parsed_body.execute).to provide(post, as: PostSerializer, with_root: :post)
       end
     end
 
     context "with no associations" do
       context "resource" do
-        it "should match serialized resource" do
-          expect(parsed_body).to provide(post, as: PostSerializer)
-        end
         context ":with_root" do
           let(:fake_root) { "fake_root" }
           let(:resource_json) { PostSerializer.new(post, root: fake_root).as_json.to_json } 
@@ -55,10 +47,6 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
 
       context "collection" do
         let(:response) { collection_json }
-        it "should match serialized resource with inferred root" do
-          expect(parsed_body).to provide(posts, as: PostSerializer)
-        end
-
         context ":with_root" do
           let(:fake_root) { "fake_root" }
           let(:collection_json) { ActiveModel::ArraySerializer.new(posts,serializer: PostSerializer, root: fake_root).as_json.to_json}
@@ -95,8 +83,14 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
       end
 
       context "resource" do
-        it "should match serialized resource" do
-          expect(parsed_body).to provide(post, as: PostSerializer)
+        it "should match with default serializer" do
+          expect(parsed_body).to provide(post)
+        end
+        context "no :as Serializer" do
+          let(:resource_json) { PostSerializer.new(post).as_json.to_json } 
+          it "should match serialized resource" do
+            expect(parsed_body).to provide(post, with_root: "post")
+          end
         end
         context ":with_root" do
           let(:fake_root) { "fake_root" }
@@ -109,8 +103,28 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
 
       context "collection" do
         let(:response) { collection_json }
-        it "should match serialized resource with inferred root" do
-          expect(parsed_body).to provide(posts, as: PostSerializer)
+
+        it "should not match serialized resource without root" do
+          expect(parsed_body).not_to provide(posts, as: PostSerializer)
+        end
+
+        context "ParsedBody selectors" do
+          
+          it do
+            expect(parsed_body[:posts].first).to provide(post, as: PostSerializer)
+          end
+          # does not work. default serializer for resouce BROKE!
+          it do
+            expect(parsed_body[:posts].first).to provide(post)
+          end
+
+        end
+
+        context "no :as Serializer" do
+          let(:collection_json) { ActiveModel::ArraySerializer.new(posts,serializer: PostSerializer, root: 'posts').as_json.to_json}
+          it "should match serialized resource with inferred root" do
+            expect(parsed_body).to provide(posts, as: PostSerializer)
+          end
         end
 
         context ":with_root" do
