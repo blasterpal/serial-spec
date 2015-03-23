@@ -57,8 +57,10 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
         expect(parsed_body).to provide(post, as: PostSerializer)
       end
       context ":with_root" do
+        let(:fake_root) { "fake_root" }
+        let(:resource_json) { PostSerializer.new(post, root: fake_root).as_json.to_json } 
         it "should match serialized resource with supplied root" do
-          expect(parsed_body).to provido(post, as: PostSerializer, root: 'tester')
+          expect(parsed_body).to provide(post, as: PostSerializer, with_root: fake_root)
         end
       end
     end
