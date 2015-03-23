@@ -36,9 +36,8 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
   context "using provide" do
 
     context ":as not valid" do
-      xit "should raise error" do
-        expect{provide(post, as: Object) == serialized_post}.to \
-          raise_error(SerialSpec::RequestResponse::ProvideMatcher::Provide::SerializerNotFound)
+      xit "should return rspec error" do
+        expect(parsed_body).to provide(post, as: String)
       end
     end
 
@@ -59,6 +58,7 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
       end
     end
     context "collection" do
+      let(:response) { collection_json }
       it "should match serialized resource" do
         expect(parsed_body).to provide(post, as: PostSerializer)
       end

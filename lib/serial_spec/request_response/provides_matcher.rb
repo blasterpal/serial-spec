@@ -29,11 +29,12 @@ module SerialSpec
         end
 
         def expected_to_hash
-          if as_serializer && serializer = as_serializer.new(expected)
-            unless serializer.respond_to?(:as_json)
+          if as_serializer
+            begin
+              as_serializer.new(expected).as_json
+            rescue StandardError #need more specificity here
               throw(:failed, :serializer_not_valid)
             end
-            serializer.as_json
           else
             ActiveModel::Serializer.new(expected).as_json
           end
