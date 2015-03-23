@@ -73,6 +73,7 @@ module SerialSpec
         # for now a lazy deep comparison, look ma' no iteration!
 
         def deep_match?(actual,expected_hash)
+require'pry';binding.pry
           unless actual.kind_of?(Hash)
             throw(:failed, :response_not_valid)
           end

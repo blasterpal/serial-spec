@@ -67,8 +67,16 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
 
     context "collection" do
       let(:response) { collection_json }
-      it "should match serialized resource" do
+      it "should match serialized resource with inferred root" do
         expect(parsed_body).to provide(posts, as: PostSerializer)
+      end
+
+      context ":with_root" do
+        let(:fake_root) { "fake_root" }
+        let(:collection_json) { ActiveModel::ArraySerializer.new(posts,serializer: PostSerializer, root: fake_root).as_json.to_json}
+        it "should match serialized resource with supplied root" do
+          expect(parsed_body).to provide(posts, as: PostSerializer, with_root: fake_root)
+        end
       end
     end
 
