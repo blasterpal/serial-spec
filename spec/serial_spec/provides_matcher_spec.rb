@@ -2,6 +2,15 @@ require 'spec_helper'
 
 describe "SerialSpec::RequestResponse::ProvideMatcher" do
   include SerialSpec::RequestResponse::ProvideMatcher
+  let(:post) do
+    Post.new(:title => "New Post", :body => "Body of new post")
+  end
+  let(:posts) do 
+    [
+    Post.new(:title => "New Post", :body => "Body of new post"),
+    Post.new(:title => "New Post2", :body => "Body of new post2")
+    ]
+  end
   let(:comments) do 
     [Comment.new(:title => "Comment1"), Comment.new(:title => "Comment2")]
   end
@@ -9,21 +18,22 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
     comments.reverse
   end
   let(:user) { User.new(name: "Enrique") }
+
   let(:serialized_post) do
     PostSerializer.new(post).as_json
   end
   let(:serialized_posts) do
     PostSerializer.new([post]).as_json
   end
-  let(:response) { PostSerializer.new(post).as_json.to_json }
-  let(:parsed_body) do 
-    SerialSpec::ParsedBody.new(response)
-  end
+
+  let(:resource_json) { PostSerializer.new(post).as_json.to_json }
+  let(:collection_json) { Activemodel::ArraySerializer.new(posts,serializer: PostSerializer, root: 'posts')}
+
+  let(:response) { resource_json }
+  let(:parsed_body) { SerialSpec::ParsedBody.new(response) }
+  let(:execute_hash) { SerialSpec::ParsedBody.new(response).execute }
 
   context "using provide" do
-    let(:post) do
-      Post.new(:title => "New Post", :body => "Body of new post")
-    end
 
     context ":as not valid" do
       xit "should raise error" do
@@ -33,10 +43,27 @@ describe "SerialSpec::RequestResponse::ProvideMatcher" do
     end
 
     context "when actual is ParsedBody" do
-      it "should match serialized model" do
+      it "should match" do
+        expect(parsed_body).to provide(post, as: PostSerializer)
+      end
+    end
+    context "when actual is Hash" do
+      it "should match" do
         expect(parsed_body.execute).to provide(post, as: PostSerializer)
       end
     end
+
+    context "resource" do
+      it "should match serialized resource" do
+        expect(parsed_body).to provide(post, as: PostSerializer)
+      end
+    end
+    context "collection" do
+      it "should match serialized resource" do
+        expect(parsed_body).to provide(post, as: PostSerializer)
+      end
+    end
+
 
     context "with no associations" do
       context "supplying :as serializer" do

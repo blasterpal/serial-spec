@@ -6,26 +6,10 @@ include ActiveModel::SerializerSupport
 include ActiveModel::ArraySerializerSupport
 
   attr_reader :options
-  def initialize(hash={},options={})
-    @attributes = hash
+  def initialize(attr=[],options={})
+    @attributes = attr
     @options = options
   end
-
-  #def read_attribute_for_serialization(name)
-    #@attributes[name]
-  #end
-
-  #def serializable_hash
-    #@attributes.deep_stringify_keys!
-  #end
-
-  #def to_json
-    #serializable_hash
-  #end
-
-  #def as_json
-    #serializable_hash
-  #end
 
 end
 

@@ -29,7 +29,6 @@ module SerialSpec
         end
 
         def expected_to_hash
-          return_hash = {}
           if as_serializer && serializer = as_serializer.new(expected)
             unless serializer.respond_to?(:as_json)
               throw(:failed, :serializer_not_valid)
@@ -40,7 +39,9 @@ module SerialSpec
           end
         end
 
-        #lazy recursive comparison
+        # TODO: improve this to be unordered comparison of keys/values for deep hashes
+        # for now a lazy deep comparison, look ma' no iteration!
+
         def deep_match?(actual,expected_hash)
           unless actual.kind_of?(Hash)
             throw(:failed, :response_not_valid)
